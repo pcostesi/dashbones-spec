@@ -1,0 +1,570 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "theme": {
+      "type": "string",
+      "enum": [
+        "red",
+        "blue",
+        "yellow",
+        "light",
+        "dark"
+      ]
+    },
+    "boxes": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "zoomed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "background": {
+                "type": "object",
+                "properties": {
+                  "red": {
+                    "type": "number"
+                  },
+                  "green": {
+                    "type": "number"
+                  },
+                  "blue": {
+                    "type": "number"
+                  },
+                  "alpha": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "red",
+                  "green",
+                  "blue",
+                  "alpha"
+                ],
+                "additionalProperties": false
+              },
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "highlightLine2": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "const": "Simple"
+              }
+            },
+            "required": [
+              "row",
+              "column",
+              "line1",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "zoomed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "background": {
+                "type": "object",
+                "properties": {
+                  "red": {
+                    "type": "number"
+                  },
+                  "green": {
+                    "type": "number"
+                  },
+                  "blue": {
+                    "type": "number"
+                  },
+                  "alpha": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "red",
+                  "green",
+                  "blue",
+                  "alpha"
+                ],
+                "additionalProperties": false
+              },
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "highlightLine2": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "Stacked"
+                  },
+                  {
+                    "type": "string",
+                    "const": "Stack"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "row",
+              "column",
+              "line1",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "zoomed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "background": {
+                "type": "object",
+                "properties": {
+                  "red": {
+                    "type": "number"
+                  },
+                  "green": {
+                    "type": "number"
+                  },
+                  "blue": {
+                    "type": "number"
+                  },
+                  "alpha": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "red",
+                  "green",
+                  "blue",
+                  "alpha"
+                ],
+                "additionalProperties": false
+              },
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "highlightLine2": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "const": "Table"
+              },
+              "header1": {
+                "type": "string"
+              },
+              "header2": {
+                "type": "string"
+              },
+              "highlightHeader": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "row",
+              "column",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "zoomed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "background": {
+                "type": "object",
+                "properties": {
+                  "red": {
+                    "type": "number"
+                  },
+                  "green": {
+                    "type": "number"
+                  },
+                  "blue": {
+                    "type": "number"
+                  },
+                  "alpha": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "red",
+                  "green",
+                  "blue",
+                  "alpha"
+                ],
+                "additionalProperties": false
+              },
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "highlightLine2": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "const": "Delta"
+              },
+              "delta": {
+                "type": "string"
+              },
+              "deltaPositive": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "row",
+              "column",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "zoomed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "background": {
+                "type": "object",
+                "properties": {
+                  "red": {
+                    "type": "number"
+                  },
+                  "green": {
+                    "type": "number"
+                  },
+                  "blue": {
+                    "type": "number"
+                  },
+                  "alpha": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "red",
+                  "green",
+                  "blue",
+                  "alpha"
+                ],
+                "additionalProperties": false
+              },
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "highlightLine2": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "const": "Chart"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": [
+              "row",
+              "column",
+              "type",
+              "data"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "zoomed": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "background": {
+                "type": "object",
+                "properties": {
+                  "red": {
+                    "type": "number"
+                  },
+                  "green": {
+                    "type": "number"
+                  },
+                  "blue": {
+                    "type": "number"
+                  },
+                  "alpha": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "red",
+                  "green",
+                  "blue",
+                  "alpha"
+                ],
+                "additionalProperties": false
+              },
+              "line1": {
+                "type": "string"
+              },
+              "line2": {
+                "type": "string"
+              },
+              "highlightLine2": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "const": "true"
+                  },
+                  {
+                    "const": "false"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "const": "Image"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "row",
+              "column",
+              "type",
+              "url"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "theme",
+    "boxes"
+  ],
+  "additionalProperties": false
+}

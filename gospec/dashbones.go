@@ -1,0 +1,273 @@
+// Package gospec provides serialization and deserialization for
+// Dashbones-compatible dashboard JSON.
+//
+// The shapes are defined by the canonical JSON Schema in schema.json (the
+// source of truth), which is generated from the TypeScript/Zod schema in this
+// repository. Marshal/Unmarshal round-trip the wire format, and Validate
+// checks bytes against the embedded JSON Schema.
+package gospec
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+)
+
+// Bool decodes the Dashbones boolean wire format, which accepts both real
+// booleans and the string literals "true"/"false" (as used by the official
+// demo). It always marshals as a real JSON boolean.
+type Bool bool
+
+// UnmarshalJSON implements json.Unmarshaler for Bool.
+func (b *Bool) UnmarshalJSON(data []byte) error {
+	var v any
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	switch x := v.(type) {
+	case bool:
+		*b = Bool(x)
+		return nil
+	case string:
+		switch x {
+		case "true":
+			*b = true
+			return nil
+		case "false":
+			*b = false
+			return nil
+		}
+	}
+	return fmt.Errorf("gospec: invalid boolean value: %s", string(data))
+}
+
+// MarshalJSON implements json.Marshaler for Bool.
+func (b Bool) MarshalJSON() ([]byte, error) {
+	if b {
+		return []byte("true"), nil
+	}
+	return []byte("false"), nil
+}
+
+// RGBColor is an RGBa color dictionary used for theme overrides and per-box
+// backgrounds. Channels are numbers (typically 0-255, alpha 0-1).
+type RGBColor struct {
+	Red   float64 `json:"red"`
+	Green float64 `json:"green"`
+	Blue  float64 `json:"blue"`
+	Alpha float64 `json:"alpha"`
+}
+
+// Theme is one of the predefined Dashbones theme names.
+type Theme string
+
+// Supported theme values.
+const (
+	ThemeRed    Theme = "red"
+	ThemeBlue   Theme = "blue"
+	ThemeYellow Theme = "yellow"
+	ThemeLight  Theme = "light"
+	ThemeDark   Theme = "dark"
+)
+
+// BoxType discriminates the box variants.
+type BoxType string
+
+// Supported box type values.
+const (
+	BoxSimple  BoxType = "Simple"
+	BoxStacked BoxType = "Stacked"
+	BoxStack   BoxType = "Stack" // alias used by the official demo
+	BoxTable   BoxType = "Table"
+	BoxDelta   BoxType = "Delta"
+	BoxChart   BoxType = "Chart"
+	BoxImage   BoxType = "Image"
+)
+
+// RGBColor overrides allowed on the dashboard root.
+type ThemeOverrides struct {
+	Background *RGBColor `json:"background,omitempty"`
+	Text       *RGBColor `json:"text,omitempty"`
+	Highlight  *RGBColor `json:"highlight,omitempty"`
+	Positive   *RGBColor `json:"positive,omitempty"`
+	Negative   *RGBColor `json:"negative,omitempty"`
+}
+
+// Dashboard is the top-level Dashbones document.
+type Dashboard struct {
+	Theme      Theme     `json:"theme"`
+	Boxes      []Box     `json:"boxes"`
+	Background *RGBColor `json:"background,omitempty"`
+	Text       *RGBColor `json:"text,omitempty"`
+	Highlight  *RGBColor `json:"highlight,omitempty"`
+	Positive   *RGBColor `json:"positive,omitempty"`
+	Negative   *RGBColor `json:"negative,omitempty"`
+}
+
+// BaseBox holds the fields shared by every box type.
+type BaseBox struct {
+	Type           BoxType   `json:"type"`
+	Row            int       `json:"row"`
+	Column         int       `json:"column"`
+	Zoomed         Bool      `json:"zoomed,omitempty"`
+	Line1          string    `json:"line1,omitempty"`
+	Line2          string    `json:"line2,omitempty"`
+	HighlightLine2 Bool      `json:"highlightLine2,omitempty"`
+	Background     *RGBColor `json:"background,omitempty"`
+}
+
+// SimpleBox is a single line of text.
+type SimpleBox struct {
+	BaseBox
+}
+
+// StackedBox is two lines of text (type "Stacked" or "Stack").
+type StackedBox struct {
+	BaseBox
+}
+
+// TableBox shows a headline and up to two header rows.
+type TableBox struct {
+	BaseBox
+	Header1         string `json:"header1,omitempty"`
+	Header2         string `json:"header2,omitempty"`
+	HighlightHeader Bool   `json:"highlightHeader,omitempty"`
+}
+
+// DeltaBox is a headline with a small delta value behind it. Deltas are two
+// columns wide and must start on an even column.
+type DeltaBox struct {
+	BaseBox
+	Delta         string `json:"delta,omitempty"`
+	DeltaPositive Bool   `json:"deltaPositive,omitempty"`
+}
+
+// ChartBox renders a bar chart from data.
+type ChartBox struct {
+	BaseBox
+	Data []float64 `json:"data"`
+}
+
+// ImageBox displays an image from a URL.
+type ImageBox struct {
+	BaseBox
+	URL string `json:"url"`
+}
+
+// Box is a discriminated union over the box types. Exactly one variant is
+// populated, matching the box's "type".
+type Box struct {
+	Type    BoxType
+	Simple  *SimpleBox
+	Stacked *StackedBox
+	Table   *TableBox
+	Delta   *DeltaBox
+	Chart   *ChartBox
+	Image   *ImageBox
+}
+
+// UnmarshalJSON dispatches on the "type" discriminator.
+func (b *Box) UnmarshalJSON(data []byte) error {
+	var probe struct {
+		Type BoxType `json:"type"`
+	}
+	if err := json.Unmarshal(data, &probe); err != nil {
+		return err
+	}
+	b.Type = probe.Type
+	switch probe.Type {
+	case BoxSimple:
+		var v SimpleBox
+		if err := json.Unmarshal(data, &v); err != nil {
+			return err
+		}
+		b.Simple = &v
+	case BoxStacked, BoxStack:
+		var v StackedBox
+		if err := json.Unmarshal(data, &v); err != nil {
+			return err
+		}
+		b.Stacked = &v
+	case BoxTable:
+		var v TableBox
+		if err := json.Unmarshal(data, &v); err != nil {
+			return err
+		}
+		b.Table = &v
+	case BoxDelta:
+		var v DeltaBox
+		if err := json.Unmarshal(data, &v); err != nil {
+			return err
+		}
+		b.Delta = &v
+	case BoxChart:
+		var v ChartBox
+		if err := json.Unmarshal(data, &v); err != nil {
+			return err
+		}
+		b.Chart = &v
+	case BoxImage:
+		var v ImageBox
+		if err := json.Unmarshal(data, &v); err != nil {
+			return err
+		}
+		b.Image = &v
+	default:
+		return fmt.Errorf("gospec: unknown box type %q", probe.Type)
+	}
+	return nil
+}
+
+// MarshalJSON serializes the populated variant.
+func (b *Box) MarshalJSON() ([]byte, error) {
+	switch b.Type {
+	case BoxSimple:
+		if b.Simple == nil {
+			return nil, errors.New("gospec: Box of type Simple has nil payload")
+		}
+		return json.Marshal(b.Simple)
+	case BoxStacked, BoxStack:
+		if b.Stacked == nil {
+			return nil, errors.New("gospec: Box of type Stacked has nil payload")
+		}
+		return json.Marshal(b.Stacked)
+	case BoxTable:
+		if b.Table == nil {
+			return nil, errors.New("gospec: Box of type Table has nil payload")
+		}
+		return json.Marshal(b.Table)
+	case BoxDelta:
+		if b.Delta == nil {
+			return nil, errors.New("gospec: Box of type Delta has nil payload")
+		}
+		return json.Marshal(b.Delta)
+	case BoxChart:
+		if b.Chart == nil {
+			return nil, errors.New("gospec: Box of type Chart has nil payload")
+		}
+		return json.Marshal(b.Chart)
+	case BoxImage:
+		if b.Image == nil {
+			return nil, errors.New("gospec: Box of type Image has nil payload")
+		}
+		return json.Marshal(b.Image)
+	default:
+		return nil, fmt.Errorf("gospec: unknown box type %q", b.Type)
+	}
+}
+
+// Unmarshal decodes a Dashboard from JSON bytes. It uses encoding/json and
+// does not enforce cross-field layout rules; call Validate for full schema
+// validation of the raw wire data.
+func Unmarshal(data []byte) (*Dashboard, error) {
+	var d Dashboard
+	if err := json.Unmarshal(data, &d); err != nil {
+		return nil, err
+	}
+	return &d, nil
+}
+
+// Marshal encodes a Dashboard to JSON bytes.
+func Marshal(d *Dashboard) ([]byte, error) {
+	return json.Marshal(d)
+}

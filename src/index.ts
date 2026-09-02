@@ -15,6 +15,8 @@ export {
   dashbonesSchema,
 } from "./schema.js";
 
+export { dashbonesJSONSchema, toDashbonesJSONSchema } from "./to-json-schema.js";
+
 export type {
   RgbColor,
   BooleanString,

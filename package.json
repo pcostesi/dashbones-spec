@@ -17,6 +17,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "gen:schema": "tsx scripts/generate-schema.ts",
     "test": "tsx --test test/**/*.test.ts"
   },
   "keywords": [

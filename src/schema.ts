@@ -120,7 +120,7 @@ export const deltaBoxSchema = boxBaseSchema.extend({
   delta: z.string().optional(),
   deltaPositive: booleanStringSchema.optional(),
   highlightLine2: booleanStringSchema.optional(),
-  zoomed: booleanStringSchema.optional().default(false),
+  zoomed: booleanStringSchema.optional(),
 }).check(({ value, issues }) => {
   if (value.zoomed) {
     issues.push({
