@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { layoutRules } from "./layout.js";
 
 /**
  * RGBa color dictionary used for theme overrides and per-box backgrounds.
@@ -122,21 +123,24 @@ export const deltaBoxSchema = boxBaseSchema.extend({
   highlightLine2: booleanStringSchema.optional(),
   zoomed: booleanStringSchema.optional(),
 }).check(({ value, issues }) => {
-  if (value.zoomed) {
-    issues.push({
-      code: "custom",
-      message: "Delta boxes cannot be zoomed",
-      path: ["zoomed"],
-      input: value.zoomed,
-    });
-  }
-  if (value.column % 2 !== 0) {
-    issues.push({
-      code: "custom",
-      message: "Delta boxes must start on an even column",
-      path: ["column"],
-      input: value.column,
-    });
+  for (const rule of layoutRules) {
+    if (!rule.types.includes(value.type)) continue;
+    if (rule.rule === "notZoomed" && value.zoomed) {
+      issues.push({
+        code: "custom",
+        message: `${value.type} boxes cannot be zoomed`,
+        path: ["zoomed"],
+        input: value.zoomed,
+      });
+    }
+    if (rule.rule === "evenColumn" && value.column % 2 !== 0) {
+      issues.push({
+        code: "custom",
+        message: `${value.type} boxes must start on an even column`,
+        path: ["column"],
+        input: value.column,
+      });
+    }
   }
 });
 
@@ -170,13 +174,17 @@ export const boxSchema = z.discriminatedUnion("type", [
   chartBoxSchema,
   imageBoxSchema,
 ]).check(({ value, issues }) => {
-  if (value.zoomed && value.column % 2 !== 0 && value.type !== "Delta") {
-    issues.push({
-      code: "custom",
-      message: "Zoomed boxes must be on an even column",
-      path: ["zoomed"],
-      input: value.zoomed,
-    });
+  const rule = "zoomedRequiresEvenColumn" as const;
+  for (const { rule: kind, types } of layoutRules) {
+    if (kind !== rule || !types.includes(value.type)) continue;
+    if (value.zoomed && value.column % 2 !== 0) {
+      issues.push({
+        code: "custom",
+        message: "Zoomed boxes must be on an even column",
+        path: ["zoomed"],
+        input: value.zoomed,
+      });
+    }
   }
 });
 
@@ -189,6 +197,15 @@ export type Box = z.infer<typeof boxSchema>;
 export const dashbonesSchema = z.object({
   theme: themeSchema,
   boxes: z.array(boxSchema),
+  /**
+   * Root-level theme overrides. Each key takes an RGBa color dictionary and
+   * overrides the corresponding color of the active `theme`.
+   */
+  background: rgbColorSchema.optional(),
+  text: rgbColorSchema.optional(),
+  highlight: rgbColorSchema.optional(),
+  positive: rgbColorSchema.optional(),
+  negative: rgbColorSchema.optional(),
 });
 
 export type Dashbones = z.infer<typeof dashbonesSchema>;

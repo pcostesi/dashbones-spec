@@ -558,8 +558,153 @@
             ],
             "additionalProperties": false
           }
+        ],
+        "x-layout": [
+          {
+            "rule": "evenColumn",
+            "types": [
+              "Delta"
+            ]
+          },
+          {
+            "rule": "notZoomed",
+            "types": [
+              "Delta"
+            ]
+          },
+          {
+            "rule": "zoomedRequiresEvenColumn",
+            "types": [
+              "Simple",
+              "Stacked",
+              "Stack",
+              "Table",
+              "Chart",
+              "Image"
+            ]
+          }
         ]
       }
+    },
+    "background": {
+      "type": "object",
+      "properties": {
+        "red": {
+          "type": "number"
+        },
+        "green": {
+          "type": "number"
+        },
+        "blue": {
+          "type": "number"
+        },
+        "alpha": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha"
+      ],
+      "additionalProperties": false
+    },
+    "text": {
+      "type": "object",
+      "properties": {
+        "red": {
+          "type": "number"
+        },
+        "green": {
+          "type": "number"
+        },
+        "blue": {
+          "type": "number"
+        },
+        "alpha": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha"
+      ],
+      "additionalProperties": false
+    },
+    "highlight": {
+      "type": "object",
+      "properties": {
+        "red": {
+          "type": "number"
+        },
+        "green": {
+          "type": "number"
+        },
+        "blue": {
+          "type": "number"
+        },
+        "alpha": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha"
+      ],
+      "additionalProperties": false
+    },
+    "positive": {
+      "type": "object",
+      "properties": {
+        "red": {
+          "type": "number"
+        },
+        "green": {
+          "type": "number"
+        },
+        "blue": {
+          "type": "number"
+        },
+        "alpha": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha"
+      ],
+      "additionalProperties": false
+    },
+    "negative": {
+      "type": "object",
+      "properties": {
+        "red": {
+          "type": "number"
+        },
+        "green": {
+          "type": "number"
+        },
+        "blue": {
+          "type": "number"
+        },
+        "alpha": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "red",
+        "green",
+        "blue",
+        "alpha"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [

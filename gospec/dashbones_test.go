@@ -154,6 +154,32 @@ func TestBoolString(t *testing.T) {
 	}
 }
 
+func TestRootOverridesRoundTrip(t *testing.T) {
+	data := []byte(`{
+  "theme": "dark",
+  "text": { "red": 255, "green": 255, "blue": 255, "alpha": 1 },
+  "positive": { "red": 0, "green": 255, "blue": 0, "alpha": 0.8 },
+  "boxes": []
+}`)
+	d, err := Unmarshal(data)
+	if err != nil {
+		t.Fatalf("Unmarshal: %v", err)
+	}
+	if d.Text == nil || d.Text.Green != 255 {
+		t.Fatalf("text override not parsed: %+v", d.Text)
+	}
+	if d.Positive == nil || d.Positive.Alpha != 0.8 {
+		t.Fatalf("positive override not parsed: %+v", d.Positive)
+	}
+	out, err := Marshal(d)
+	if err != nil {
+		t.Fatalf("Marshal: %v", err)
+	}
+	if err := Validate(out); err != nil {
+		t.Fatalf("marshaled output failed validation: %v\n%s", err, out)
+	}
+}
+
 func TestUnmarshalRejectsUnknownBoxType(t *testing.T) {
 	data := []byte(`{"theme":"red","boxes":[
 	  {"type":"Widget","row":0,"column":0}

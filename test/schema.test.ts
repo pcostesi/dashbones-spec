@@ -128,3 +128,23 @@ test("parses boolean value for zoomed", () => {
   });
   assert.equal(result.success, true);
 });
+
+test("parses root theme overrides", () => {
+  const result = dashbonesSchema.safeParse({
+    theme: "dark",
+    background: { red: 0, green: 0, blue: 0, alpha: 1 },
+    text: { red: 255, green: 255, blue: 255, alpha: 1 },
+    positive: { red: 0, green: 255, blue: 0, alpha: 0.8 },
+    boxes: [],
+  });
+  assert.equal(result.success, true);
+  if (result.success) {
+    assert.deepEqual(result.data.background, {
+      red: 0,
+      green: 0,
+      blue: 0,
+      alpha: 1,
+    });
+    assert.equal(result.data.text?.green, 255);
+  }
+});

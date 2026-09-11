@@ -18,6 +18,7 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "gen:schema": "tsx scripts/generate-schema.ts",
+    "gen:go": "tsx scripts/generate-go.ts",
     "test": "tsx --test test/**/*.test.ts"
   },
   "keywords": [
