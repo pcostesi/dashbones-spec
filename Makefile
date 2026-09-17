@@ -1,17 +1,16 @@
 # Dashbones spec — pipeline automation.
 #
-# Derivation chain (everything is derived, nothing is hand-written except the
-# TS/Zod source and this pipeline):
+# Only the TS/Zod source (src/) and this pipeline are hand-written. Everything
+# else is derived:
 #   src/schema.ts  ->  gospec/schema.json (gen-schema, via Zod toJSONSchema)
 #   gospec/schema.json  ->  gospec/dashbones.go + gospec/validate.go (gen-go)
 #
-# So "re-doing" the pipeline means:
-#   1. regenerate the canonical JSON Schema from Zod
-#   2. regenerate the Go package from the JSON Schema
-#   3. confirm both are unchanged (or commit the changes)
-#   4. verify the Go package still builds, vets, and passes; run both test suites
+# The generated artifacts are COMMITTED so the Go module is self-contained
+# (validate.go embeds schema.json) and any tag or branch builds cleanly.
+# CI enforces they stay in sync with the Zod source (sync-check) and uploads
+# them as a build artifact.
 
-.PHONY: all check gen gen-schema gen-go sync-check test test-ts test-go build build-ts build-go vet typecheck clean
+.PHONY: all check gen gen-schema gen-go sync-check test test-ts test-go build build-ts build-go vet clean
 
 all: check
 
@@ -26,9 +25,11 @@ gen-go:
 
 gen: gen-schema gen-go
 
-# Regenerate everything, then fail if any committed derived artifact drifted.
+# Drift gate: regenerate everything, then require the committed generated
+# artifacts to be untouched. Fails if a developer changed sources without
+# regenerating (or hand-edited generated code). CI runs this on every change.
 sync-check: gen
-	git diff --exit-code gospec/schema.json gospec/dashbones.go gospec/validate.go
+	git diff --exit-code -- gospec/schema.json gospec/dashbones.go gospec/validate.go
 
 typecheck:
 	npm run typecheck
@@ -52,7 +53,8 @@ build: build-ts build-go
 vet:
 	cd gospec && go vet ./...
 
-# Full re-do: regenerate schema + Go, typecheck TS, vet/build Go, run both suites.
+# Full re-do: generate artifacts (schema + Go), typecheck TS, vet/build Go,
+# run both suites.
 check: gen typecheck vet build test
 
 clean:

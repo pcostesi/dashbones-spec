@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # make check regenerates gospec/schema.json + gospec/dashbones.go +
+      # gospec/validate.go from src/schema.ts, then typechecks, vets, builds,
+      # and runs both the TS and Go test suites against them.
+      - name: Regenerate artifacts and run full check
+        run: make check
+
+      # Drift gate: commits regression of the generated artifacts or a
+      # hand-edit of generated code. sync-check regenerates and demands the
+      # committed files are byte-identical.
+      - name: Verify committed artifacts are in sync with the source
+        run: make sync-check
+
+      - name: Upload generated artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashbones-spec-generated
+          path: |
+            gospec/schema.json
+            gospec/dashbones.go
+            gospec/validate.go

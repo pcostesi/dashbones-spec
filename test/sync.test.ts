@@ -5,13 +5,12 @@ import { toDashbonesJSONSchema, dashbonesSchema } from "../src/index.js";
 
 const schemaPath = new URL("../gospec/schema.json", import.meta.url);
 
-test("committed gospec/schema.json is in sync with the Zod source of truth", () => {
-  const committed = JSON.parse(readFileSync(schemaPath, "utf8"));
-  const generated = toDashbonesJSONSchema();
+test("gospec/schema.json is in sync with the Zod source of truth", () => {
+  const onDisk = JSON.parse(readFileSync(schemaPath, "utf8"));
   assert.deepEqual(
-    generated,
-    committed,
-    "gospec/schema.json is out of date. Regenerate it with: npm run gen:schema",
+    onDisk,
+    toDashbonesJSONSchema(),
+    "gospec/schema.json is out of date. Regenerate it with: make gen",
   );
 });
 
