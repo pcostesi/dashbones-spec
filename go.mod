@@ -1,4 +1,4 @@
-module github.com/pcostesi/dashbones-spec/gospec
+module github.com/pcostesi/dashbones-spec
 
 go 1.24.3
 

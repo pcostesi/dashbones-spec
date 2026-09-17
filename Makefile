@@ -38,7 +38,7 @@ test-ts:
 	npm test
 
 test-go:
-	cd gospec && go test ./...
+	go test ./gospec/...
 
 test: test-ts test-go
 
@@ -46,12 +46,12 @@ build-ts:
 	npm run build
 
 build-go:
-	cd gospec && go build ./...
+	go build ./...
 
 build: build-ts build-go
 
 vet:
-	cd gospec && go vet ./...
+	go vet ./gospec/...
 
 # Full re-do: generate artifacts (schema + Go), typecheck TS, vet/build Go,
 # run both suites.
